@@ -1,0 +1,19 @@
+{
+  "name": "filo-media",
+  "version": "1.2.0",
+  "private": true,
+  "description": "Filo 图库 — Cloudflare Workers + R2 可部署版本",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "check": "node --check src/worker.js && node --check src/store.js && node --check src/auth.js && node --check public/js/app.js && wrangler deploy --dry-run",
+    "seed": "bash scripts/seed.sh"
+  },
+  "devDependencies": {
+    "wrangler": "^3.90.0"
+  },
+  "dependencies": {
+    "client-zip": "^2.4.5"
+  }
+}

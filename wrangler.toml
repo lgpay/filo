@@ -1,0 +1,28 @@
+name = "filo-media"
+main = "src/worker.js"
+compatibility_date = "2025-01-01"
+
+# 前端静态资源（public/）由 Workers Static Assets 托管。
+# 访问非 /api/ 路径时，Worker 会转交 ASSETS 处理，部署即更新、无需重启。
+[assets]
+directory = "public"
+binding = "ASSETS"
+
+# R2 存储桶（文件存储后端）
+[[r2_buckets]]
+binding = "FILO_STORAGE"
+bucket_name = "filo-media"
+
+# Filo Worker 运行时变量（敏感信息请用 wrangler secret put 设置）
+[vars]
+ALLOW_MANAGEMENT = "true"   # 是否允许上传/删除/编辑等写操作
+IMAGE_RESIZE = "true"       # 是否用 Cloudflare Image Resizing 生成缩略图
+THUMB_SIZE = "320"          # 缩略图尺寸
+THUMB_RETINA = "480"
+MENU_MAX_DEPTH = "5"        # 侧边栏目录树最大递归深度
+ROOT_NAME = "Filo"          # 根目录显示名
+# QUOTA_BYTES = "10737418240"  # 可选：显示存储配额
+
+# Filo 访问密码：使用 Worker Secret 设置（不要写进仓库）
+#   wrangler secret put ACCESS_PASSWORD
+# 留空 = 完全开放（任何人可浏览/下载）

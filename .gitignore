@@ -1,0 +1,14 @@
+# 依赖
+node_modules/
+
+# wrangler 本地状态（本地 R2 / KV 模拟）
+.wrangler/
+
+# 密钥（切勿提交）
+.dev.vars
+.env
+*.local
+
+# 系统文件
+.DS_Store
+Thumbs.db
