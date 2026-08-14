@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Filo</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="body-loading">
+  <main id="main">
+    <nav id="topbar" class="topbar-sticky">
+      <div id="topbar-top">
+        <a id="brand" href="#">
+          <span class="brand-dot"></span> Filo
+        </a>
+        <div id="tools" class="tools">
+          <div class="dropdown" id="dd-new">
+            <button class="btn" id="btn-new" title="新建"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+            <div class="dropdown-menu menu-left" id="new-menu">
+              <div class="ctx-item" data-act="mkfile"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>新建文件</div>
+              <div class="ctx-item" data-act="mkdir"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M12 11v4M10 13h4"/></svg></span>新建文件夹</div>
+            </div>
+          </div>
+          <div class="dropdown" id="dd-upload">
+            <button class="btn" id="btn-upload" title="上传"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M5 20h14"/></svg></button>
+            <div class="dropdown-menu menu-left" id="upload-menu">
+              <div class="ctx-item" data-act="local"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M5 20h14"/></svg></span>本地上传</div>
+              <div class="ctx-item" data-act="remote"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.6 2.6 15 0 18M12 3c-2.6 2.6-2.6 15 0 18"/></svg></span>远程上传</div>
+            </div>
+          </div>
+          <button class="btn" id="btn-refresh" title="刷新"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>
+          <button class="btn" id="btn-select" title="选择"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l3 3 5-6"/></svg></button>
+        </div>
+        <div id="batchbar" class="tools hidden">
+          <span id="sel-count">已选 0 项</span>
+          <button class="btn small primary" id="btn-batch-download" title="下载选中为 ZIP"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M5 20h14"/></svg> ZIP</button>
+          <button class="btn small" id="btn-batch-move" title="移动选中到…"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6M11 6 5 12l6 6"/></svg> 移动</button>
+          <button class="btn small danger" id="btn-batch-delete" title="删除选中"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg> 删除</button>
+          <button class="btn small" id="btn-batch-cancel" title="取消选择">取消</button>
+        </div>
+        <div id="search-container">
+          <input id="search" class="input" type="search" placeholder="搜索…" size="1"
+                 spellcheck="false" autocomplete="off" autocapitalize="off">
+        </div>
+        <div id="change-layout" class="dropdown">
+          <button class="btn" id="layout-btn" title="布局"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h6"/></svg></button>
+          <div class="dropdown-menu menu-right" id="layout-menu"></div>
+        </div>
+        <div id="change-sort" class="dropdown">
+          <button class="btn" id="sort-btn" title="排序"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4v16M4 8l4-4 4 4M16 20V4M12 16l4 4 4-4"/></svg></button>
+          <div class="dropdown-menu menu-right" id="sort-menu"></div>
+        </div>
+        <button class="btn hidden" id="auth-btn" title="登录"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
+        <button class="btn" id="help-btn" title="快捷键 (?)">?</button>
+      </div>
+      <div id="files-sortbar"></div>
+      <div id="topbar-info" class="info-hidden"></div>
+    </nav>
+
+    <div id="files-container">
+      <div id="files" class="list files-rows"></div>
+    </div>
+  </main>
+
+  <button id="sidebar-toggle" type="button" class="button-icon" title="收起目录" aria-label="收起目录">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 6 9 12 15 18"></polyline></svg>
+  </button>
+  <aside id="sidebar">
+    <div id="sidebar-inner">
+      <div id="sidebar-topbar"><span id="sidebar-title">目录</span></div>
+      <div id="sidebar-menu"></div>
+    </div>
+  </aside>
+  <div id="sidebar-bg"></div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="hidden">
+    <button id="lb-close" class="lb-btn lb-close" title="关闭 (Esc)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <button id="lb-prev" class="lb-btn lb-nav lb-prev" title="上一张 (←)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <button id="lb-next" class="lb-btn lb-nav lb-next" title="下一张 (→)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+    <button id="lb-play" class="lb-btn lb-play" title="幻灯片播放/暂停 (S)"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M8 5v14l11-7z"/></svg></button>
+    <button id="lb-zoom" class="lb-btn lb-zoom" title="缩放 (Z / 滚轮)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>
+    <button id="lb-full" class="lb-btn lb-full" title="全屏 (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    <button id="lb-dl" class="lb-btn lb-dl" title="下载"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M5 20h14"/></svg></button>
+    <div id="lb-stage"><img id="lb-img" alt=""></div>
+    <div id="lb-caption"></div>
+    <div id="lb-counter"></div>
+    <div id="lb-strip"></div>
+  </div>
+
+  <!-- Context menu -->
+  <div id="contextmenu" class="ctx-menu hidden">
+    <div class="ctx-item" data-act="open" data-type="all"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>打开 / 预览</div>
+    <div class="ctx-item" data-act="download" data-type="file"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M5 20h14"/></svg></span>下载</div>
+    <div class="ctx-item ctx-public" data-act="copylink" data-type="file"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3A4 4 0 0 0 11 18.66l1-1"/></svg></span>复制直连</div>
+    <div class="ctx-item ctx-public-flag" data-act="setpublic" data-type="dir"><span class="ctx-icon" data-role="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9 1"/></svg></span><span data-role="label">设为公开</span></div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item mgmt-only" data-act="mkfile" data-type="dir"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>新建文件</div>
+    <div class="ctx-item mgmt-only" data-act="mkdir" data-type="dir"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M12 11v4M10 13h4"/></svg></span>新建文件夹</div>
+    <div class="ctx-item mgmt-only ctx-edit" data-act="edit" data-type="file"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>编辑</div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item" data-act="storage" data-type="home"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M10 12h4"/></svg></span>查看存储</div>
+    <div class="ctx-item mgmt-only" data-act="move" data-type="all"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6M11 6 5 12l6 6"/></svg></span>移动到…</div>
+    <div class="ctx-item mgmt-only" data-act="copy" data-type="all"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg></span>复制到…</div>
+    <div class="ctx-item mgmt-only" data-act="rename" data-type="all"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>重命名</div>
+    <div class="ctx-item mgmt-only danger" data-act="delete" data-type="all"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></span>删除</div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item" data-act="details" data-type="all"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.01"/></svg></span>详细信息</div>
+  </div>
+
+  <!-- Empty-area context menu (right-click on the blank view) -->
+  <div id="ctx-empty" class="ctx-menu hidden">
+    <div class="ctx-item mgmt-only" data-act="mkfile"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>新建文件</div>
+    <div class="ctx-item mgmt-only" data-act="mkdir"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M12 11v4M10 13h4"/></svg></span>新建文件夹</div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item mgmt-only" data-act="local"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M5 20h14"/></svg></span>本地上传</div>
+    <div class="ctx-item mgmt-only" data-act="remote"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.6 2.6 15 0 18M12 3c-2.6 2.6-2.6 15 0 18"/></svg></span>远程上传</div>
+    <div class="ctx-divider"></div>
+    <div class="ctx-item" data-act="refresh"><span class="ctx-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></span>刷新</div>
+  </div>
+
+  <!-- Generic modal (new folder / rename) -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-box">
+      <div id="modal-title" class="modal-title"></div>
+      <input id="modal-input" class="input" type="text" autocomplete="off">
+      <div class="modal-actions">
+        <button class="btn small" id="modal-cancel">取消</button>
+        <button class="btn small primary" id="modal-ok">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Move / copy destination picker -->
+  <div id="modal-move" class="modal hidden">
+    <div class="modal-box">
+      <div id="modal-move-title" class="modal-title">移动到…</div>
+      <select id="move-dest" class="input"></select>
+      <div class="modal-actions">
+        <button class="btn small" id="move-cancel">取消</button>
+        <button class="btn small primary" id="move-ok">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login modal -->
+  <div id="modal-login" class="modal login-modal hidden">
+    <div class="modal-box login-box">
+      <div class="login-title"><svg class="modal-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Filo 已启用密码保护</div>
+      <div class="login-sub">需要密码才能进入。登录后可管理文件，并将目录设为公开以便文件免登录直连。</div>
+      <input id="login-input" class="input" type="password" placeholder="请输入访问密码" autocomplete="off" spellcheck="false">
+      <div id="login-error" class="login-error"></div>
+      <div class="modal-actions">
+        <button class="btn small primary" id="login-ok">登录</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keyboard shortcuts help -->
+  <div id="help" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-title">键盘快捷键</div>
+      <table class="help-table">
+        <tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>灯箱上一张 / 下一张</td></tr>
+        <tr><td><kbd>Esc</kbd></td><td>关闭灯箱 / 弹窗</td></tr>
+        <tr><td><kbd>F</kbd></td><td>灯箱全屏</td></tr>
+        <tr><td><kbd>S</kbd></td><td>幻灯片播放 / 暂停</td></tr>
+        <tr><td><kbd>Z</kbd></td><td>灯箱放大 / 还原</td></tr>
+        <tr><td><kbd>滚轮</kbd></td><td>灯箱内缩放</td></tr>
+        <tr><td><kbd>?</kbd></td><td>显示本帮助</td></tr>
+        <tr><td><kbd>Ctrl/⌘ + S</kbd></td><td>保存正在编辑的文件</td></tr>
+      </table>
+      <div class="modal-actions">
+        <button class="btn small primary" id="help-close">知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Remote upload (fetch from URL) -->
+  <div id="modal-remote" class="modal hidden">
+    <div class="modal-box remote-box">
+      <div class="modal-title"><svg class="modal-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.6 2.6 15 0 18M12 3c-2.6 2.6-2.6 15 0 18"/></svg> 远程上传</div>
+      <div class="modal-sub">从远程 URL 拉取文件到当前目录（每行一个链接）</div>
+      <div id="remote-target" class="remote-target"></div>
+      <textarea id="remote-urls" class="input remote-textarea" rows="6"
+                placeholder="https://example.com/photo.jpg" spellcheck="false"></textarea>
+      <div id="remote-result" class="remote-result hidden"></div>
+      <div class="modal-actions">
+        <button class="btn small" id="remote-cancel">取消</button>
+        <button class="btn small primary" id="remote-ok">拉取</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Storage usage -->
+  <div id="modal-storage" class="modal hidden">
+    <div class="modal-box storage-box">
+      <div class="modal-title"><svg class="modal-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8M10 12h4"/></svg> 存储用量</div>
+      <div id="storage-body" class="storage-body">
+        <div class="storage-row"><span>已用</span><b id="storage-used">—</b></div>
+        <div class="storage-row"><span>可用</span><b id="storage-free">—</b></div>
+        <div class="storage-row"><span>总量</span><b id="storage-total">—</b></div>
+        <div class="storage-bar"><div id="storage-fill"></div></div>
+        <div id="storage-pct" class="storage-pct"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn small primary" id="storage-close">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Item details -->
+  <div id="modal-details" class="modal hidden">
+    <div class="modal-box details-box">
+      <div class="modal-title"><svg class="modal-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.01"/></svg> 详细信息</div>
+      <div id="details-head" class="details-head">
+        <div id="details-icon" class="details-icon"></div>
+        <div class="details-title">
+          <div id="details-name" class="details-name"></div>
+          <div id="details-sub" class="details-sub"></div>
+        </div>
+      </div>
+      <div id="details-list" class="details-list"></div>
+      <div class="modal-actions">
+        <button class="btn small primary" id="details-close">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New file -->
+  <div id="modal-mkfile" class="modal hidden">
+    <div class="modal-box mkfile-box">
+      <div class="modal-title">新建文件</div>
+      <div class="modal-sub">在当前 / 目标目录创建一个文本文件</div>
+      <input id="mkfile-name" class="input" type="text" placeholder="文件名，如 note.txt" autocomplete="off" spellcheck="false">
+      <textarea id="mkfile-content" class="input edit-textarea" rows="8"
+                placeholder="初始内容（可留空）" spellcheck="false"></textarea>
+      <div class="modal-actions">
+        <button class="btn small" id="mkfile-cancel">取消</button>
+        <button class="btn small primary" id="mkfile-ok">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit text file -->
+  <div id="modal-edit" class="modal hidden">
+    <div class="modal-box edit-box">
+      <div class="modal-title" id="edit-title">编辑</div>
+      <div class="modal-sub" id="edit-path"></div>
+      <div class="edit-area">
+        <div class="edit-gutter" id="edit-gutter"></div>
+        <textarea id="edit-content" class="input edit-textarea" rows="16"
+                  spellcheck="false"></textarea>
+      </div>
+      <div class="edit-meta" id="edit-meta"></div>
+      <div class="modal-actions">
+        <button class="btn small" id="edit-cancel">取消</button>
+        <button class="btn small primary" id="edit-ok">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="file-input" multiple hidden>
+  <div id="upload-bar" class="hidden">
+    <div id="upload-fill"></div>
+    <span id="upload-text"></span>
+  </div>
+  <div id="loading" class="loading-spinner"></div>
+
+  <script src="/js/app.js" type="module"></script>
+</body>
+</html>

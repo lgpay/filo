@@ -1,0 +1,21 @@
+# dependencies
+node_modules
+
+# runtime caches / generated data
+.cache
+sample-files
+
+# env / secrets
+.env
+.env.*
+
+# logs
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# development / personal artifacts (do not ship)
+shot-*.png
+screenshots/
