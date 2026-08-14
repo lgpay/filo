@@ -109,6 +109,17 @@ async function loadMenuLevel(path = '') {
   const rows = await api('/api/dirs', { path });
   const normalized = (rows || []).map((d) => ({ ...d, path: d.path || '' }));
   const known = new Map(state.dirs.map((d) => [d.path, d]));
+  const parent = path ? path.replace(/\/[^/]+$/, '') : '';
+  const freshPaths = new Set(normalized.map((d) => d.path));
+  // 当前层级以服务端结果为准，删除已不存在的目录及其旧子树。
+  for (const old of [...known.keys()]) {
+    const oldParent = old.includes('/') ? old.slice(0, old.lastIndexOf('/')) : '';
+    if (oldParent === path && !freshPaths.has(old)) {
+      for (const candidate of [...known.keys()]) {
+        if (candidate === old || candidate.startsWith(old + '/')) known.delete(candidate);
+      }
+    }
+  }
   normalized.forEach((d) => known.set(d.path, d));
   state.dirs = [...known.values()];
   return normalized;
@@ -193,7 +204,19 @@ async function doLogout() {
 async function refreshAll() {
   // 记录当前已展开的目录，随后清空它们的文件缓存，使移动/删除后树能立即反映变化。
   const expanded = [...state.expanded];
-  for (const p of expanded) state.fileCache.delete(p);
+  for (const p of expanded) {
+    state.fileCache.delete(p);
+    state.publicCache.delete(p);
+    state.publicCache.delete(`${p}:self`);
+  }
+  // 删除/移动后，清理当前已知目录树中属于已删除路径的缓存。
+  if (state.current?.files) {
+    const removed = new Set(state.selection);
+    for (const p of [...state.fileCache.keys()]) {
+      if ([...removed].some((r) => p === r || p.startsWith(r + '/'))) state.fileCache.delete(p);
+    }
+  }
+  state.expanded = new Set([...state.expanded].filter((p) => ![...state.selection].some((r) => p === r || p.startsWith(r + '/'))));
   try {
     await loadMenuLevel('');
     renderMenu();
@@ -442,10 +465,11 @@ function makeCard(f, { thumbSize, withCheck = true, showParent = false } = {}) {
     }));
   });
 
-  // 主视图卡片不作为内部移动的拖拽源，避免误拖动导致文件夹被移动。
-  // 文件夹卡片仍接受外部文件拖入上传。
-  if (state.allowManagement && !state.searchMode && f.is_dir) {
-    wireDropTarget(card, { path: f.path, name: f.basename });
+  // 主视图文件夹支持内部移动，但只有拖到明确的目录卡片/侧边栏目录行才执行。
+  // 拖到主视图空白区域不会移动。
+  if (state.allowManagement && !state.searchMode) {
+    if (f.is_dir) wireDropTarget(card, { path: f.path, name: f.basename });
+    wireDragSource(card, f.path, true);
   }
 
   return card;
