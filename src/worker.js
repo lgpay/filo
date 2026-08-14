@@ -272,9 +272,10 @@ export default {
         const cached = cachedDir(cacheKey);
         if (cached) return json(cached);
         const page = await listDirPage(env.FILO_STORAGE, rel, limit, cursor);
-        const children = page.dirs.map((name) => lightweightDirEntry(
-          rel ? rel + '/' + name : name, cfg,
-        ));
+        const children = await Promise.all(page.dirs.map(async (name) => {
+          const childRel = rel ? rel + '/' + name : name;
+          return buildDir(env.FILO_STORAGE, childRel, false, cfg);
+        }));
         const fileObjs = await Promise.all(page.files.map((f) => buildFileForPage(
           rel ? rel + '/' + f.name : f.name, f.obj,
         )));

@@ -232,8 +232,10 @@ async function buildFile(bucket, rel, obj, cfg) {
 
 export async function buildDir(bucket, rel, withFiles, cfg) {
   const basename = rel ? rel.split('/').pop() : (cfg.ROOT_NAME || 'Filo');
-  // 目录 mtime 不是图库基本功能，避免为目录标记额外执行 R2 head 请求。
-  const marker = null;
+  const { dirs, files } = await listDir(bucket, rel);
+  const latest = files.reduce((max, f) => Math.max(max, f.obj.uploaded ? f.obj.uploaded.getTime() : 0), 0);
+  const marker = await headObject(bucket, rel ? rel + '/' : '');
+  const dirMtime = Math.max(marker?.uploaded?.getTime?.() || 0, latest);
   const dir = {
     basename,
     fileperms: '0755',
@@ -243,7 +245,7 @@ export async function buildDir(bucket, rel, withFiles, cfg) {
     is_link: false,
     is_dir: true,
     mime: 'directory',
-    mtime: marker ? Math.floor(marker.uploaded.getTime() / 1000) : 0,
+    mtime: dirMtime ? Math.floor(dirMtime / 1000) : 0,
     path: rel,
     files_count: 0,
     dirsize: 0,
@@ -253,7 +255,6 @@ export async function buildDir(bucket, rel, withFiles, cfg) {
   };
   if (cfg.AUTH_ENABLED) dir.public = await isPublic(bucket, rel);
 
-  const { dirs, files } = await listDir(bucket, rel);
   if (!withFiles) {
     dir.files_count = dirs.length + files.length;
     return dir;
