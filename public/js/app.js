@@ -1386,9 +1386,15 @@ async function togglePublicDir(dirPath, currentlyPublic) {
   try {
     const j = await apiPost('/api/public', { path: dirPath, public: make });
     if (j.error) throw new Error(j.error);
-    // force-refresh the toggled dir's cached public flag + file leaves
     state.fileCache.delete(dirPath);
-    state.publicCache.delete(dirPath);
+    state.publicCache.set(dirPath, make);
+    state.publicCache.set(`${dirPath}:self`, make);
+    const treeDir = state.dirs.find((d) => d.path === dirPath);
+    if (treeDir) {
+      treeDir.public_self = make;
+      treeDir.public = make || !!state.publicCache.get(dirPath);
+    }
+    renderMenu();
     toast(make ? '已设为公开' : '已取消公开');
     await refreshAll();
   } catch (e) {
