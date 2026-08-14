@@ -558,8 +558,8 @@ function renderMenu() {
 
 function renderTreeNode(node) {
   const wrap = document.createElement('div');
-  wrap.className = 'tree-node';
   const expanded = state.expanded.has(node.path);
+  wrap.className = 'tree-node' + (expanded ? '' : ' collapsed');
 
   const row = document.createElement('div');
   row.className = 'tree-row dir';
