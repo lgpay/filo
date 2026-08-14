@@ -442,10 +442,10 @@ function makeCard(f, { thumbSize, withCheck = true, showParent = false } = {}) {
     }));
   });
 
-  // ---- drag to move (management only, not in search mode) ----
-  if (state.allowManagement && !state.searchMode) {
-    wireDragSource(card, f.path, true);
-    if (f.is_dir) wireDropTarget(card, { path: f.path, name: f.basename });
+  // 主视图卡片不作为内部移动的拖拽源，避免误拖动导致文件夹被移动。
+  // 文件夹卡片仍接受外部文件拖入上传。
+  if (state.allowManagement && !state.searchMode && f.is_dir) {
+    wireDropTarget(card, { path: f.path, name: f.basename });
   }
 
   return card;
@@ -1130,6 +1130,8 @@ function wireManagement() {
   // 目录行(.tree-row.dir)/视图文件夹卡片(.card.folder) 自身处理器已 stopPropagation 接管“拖到行/卡片上”，
   // 此处只处理“拖到目录行之间空白 / 文件叶子 / 侧边栏留白 / 主视图留白”。
   const fc = $('#files-container');
+  // 只有侧边栏目录行可作为内部移动目标；主视图留白不再触发移动。
+  // 主视图文件夹卡片只处理外部文件上传。
   // highlight a single sidebar directory as the (move/upload) target, clearing others first
   const setTargetHi = (row, move) => {
     clearTargets();
@@ -1167,21 +1169,22 @@ function wireManagement() {
     const inView = !!e.target.closest('#files-container');
     if (!inSidebar && !inView) return; // 落在无关区域（顶栏等）忽略
     if (dragItems.length) {
-      // 内部移动：空白处 → 目标目录（子目录展开区域下方→该子目录；主视图空白→当前目录）
+      // 内部移动只允许拖到明确的侧边栏目录行；主视图留白不执行移动。
+      if (!inSidebar) return;
+      const row = dirRowForTarget(e.target);
+      if (!row) return;
       e.preventDefault();
-      const target = inSidebar ? (dirRowForTarget(e.target)?.dataset.path ?? '') : state.path;
-      dropMove(dragItems, target);
+      dropMove(dragItems, row.dataset.path ?? '');
       dragItems = [];
       endUploadDrag();
-    } else {
-      if (!hasExternalFiles(e) || !e.dataTransfer?.files?.length) return;
-      e.preventDefault();
-      // 侧边栏内：上传到鼠标位置隶属的目录（拖到某子目录展开区域下方 → 该子目录；
-      // 拖到主目录 Home 下方/侧边栏留白 → 根目录）。主视图空白 → 当前目录。
-      const target = inSidebar ? (dirRowForTarget(e.target)?.dataset.path ?? '') : state.path;
-      uploadFiles(e.dataTransfer.files, target);
-      endUploadDrag();
+      return;
     }
+    if (!hasExternalFiles(e) || !e.dataTransfer?.files?.length) return;
+      e.preventDefault();
+    // 外部文件上传仍可拖到主视图或侧边栏目录。
+    const target = inSidebar ? (dirRowForTarget(e.target)?.dataset.path ?? '') : state.path;
+    uploadFiles(e.dataTransfer.files, target);
+    endUploadDrag();
   });
   // 任意拖拽结束（含移出页面/取消）统一清理高亮与提示，避免“粘住”
   document.addEventListener('dragend', () => { dragItems = []; endUploadDrag(); });

@@ -368,7 +368,7 @@ export async function moveItems(bucket, items, dest, copy) {
     const finalRel = dest ? dest + '/' + finalName : finalName;
 
     if (isDir) {
-      if (rel === dest || (dest + '/').startsWith(rel + '/')) continue; // 禁止移入自身或子目录
+      if (isDir && (rel === dest || (dest + '/').startsWith(rel + '/'))) continue; // 禁止移入自身或子目录
       const srcs = [];
       let cursor;
       do {
