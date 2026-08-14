@@ -220,7 +220,8 @@ async function loadDir(rel) {
       throw new Error(dir.error);
     }
     const fileMap = Object.fromEntries((dir.files || []).map((f) => [f.basename, f]));
-    state.current = { ...dir, files: fileMap, files_count: (dir.dirs || []).length + (dir.files || []).length };
+    state.current = { ...dir, files: fileMap, files_count: (dir.dirs || []).length + (dir.files || []).length }; 
+    state.publicCache.set(rel, !!dir.public);
     state.pageCursor = dir.next_cursor || null;
     state.path = rel;
     location.hash = rel;
@@ -702,6 +703,7 @@ async function ensureFiles(path) {
       // via the directory skeleton, so only keep actual files as leaves.
       state.fileCache.set(path, dir.files || []);
       state.publicCache.set(path, !!dir.public);
+      state.publicCache.set(`${path}:self`, !!dir.public_self);
       state.publicCache.set(path, !!dir.public); // inherited public flag (for tree right-click)
       renderMenu();
     }

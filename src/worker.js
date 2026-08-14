@@ -12,7 +12,7 @@ import {
   safeRel, extOf, mimeFromExt,
   listDir, listDirPage, buildDir, collectDirs, isPublic, setPublic, dirExists,
   ensureDir, putObject, getObject, headObject, deleteItems, moveItems, renameItem,
-  search, storageStats, uniqueName, looksText,
+  search, storageStats, uniqueName, looksText, dirIsPublicSelf,
 } from './store.js';
 import { imageCfOptions } from './img.js';
 import * as auth from './auth.js';
@@ -284,6 +284,8 @@ export default {
           files: fileObjs.filter(Boolean),
           next_cursor: page.cursor,
           has_more: !!page.cursor,
+          public: await cachedPublic(env.FILO_STORAGE, rel),
+          public_self: await dirIsPublicSelf(env.FILO_STORAGE, rel),
         };
         saveDirCache(cacheKey, response);
         return json(response);
